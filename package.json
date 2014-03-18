@@ -1,0 +1,13 @@
+{
+  "name": "Pinger",
+  "version": "0.1.0",
+  "description": "Pinger by node express web.",
+  "main": "app.js",
+  "dependencies": {
+    "async": "~0.2.10",
+    "date-utils": "~1.2.15",
+    "express": "~3.4.8",
+    "ping": "~0.1.7"
+  },
+  "author": "Ryan Shin"
+}
