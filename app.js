@@ -1,6 +1,6 @@
 var express 	= require('express'),
     app		= express();
-var ping	= require('ping');
+var ping	= require('net-ping');
 var path	= require('path');
 var async	= require('async');
 require('date-utils');
@@ -12,8 +12,11 @@ app.use(express.urlencoded());
 
 app.get('/:address', function(req, res) {
 	var host = req.params.address;
-	
-	ping.sys.probe(host, function(isAlive) {
+  var session = ping.createSession ();
+	session.pingHost(host, function(error, target) {
+    var isAlive = true;
+    if(error)
+      isAlive = false;
 		var obj = { host : host, alive : isAlive };
 		res.send(200, obj);
 	});
@@ -21,17 +24,21 @@ app.get('/:address', function(req, res) {
 
 function ping_all(address_array, fn){
 	var ping_func = function(item, doneCallback) {
-		ping.sys.probe(item, function(isAlive) {
+      var session = ping.createSession ();
+		  session.pingHost(item, function(error, target) {
+      var isAlive = true;
+      if(error)
+        isAlive = false;
 			var element = { host : item, alive : isAlive };
 			return doneCallback(null, element);
 		});
 	};
-	async.map(address_array, 
-		ping_func,	
+	async.map(address_array,
+		ping_func,
 		function(err, results){
 			fn(results);
 		}
-	);	
+	);
 }
 
 app.post('/:address', function(req, res) {
@@ -42,6 +49,4 @@ app.post('/:address', function(req, res) {
 	});
 });
 
-app.listen(process.env.PORT || 3000);
-
-
+app.listen(process.env.PORT || 4000);
