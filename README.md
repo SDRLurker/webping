@@ -1,7 +1,7 @@
 # webping 
 ## by node.js
 ### 제작정보
-http://nodejs-webping.rhcloud.com/
+http://webping.url.ph/
 
 이 소스를 바탕으로 하여 위의 웹페이지가 구동됩니다.
 
@@ -16,7 +16,7 @@ http://nodejs-webping.rhcloud.com/
 ※ 언제든지 주소(도메인 IP)는 추가하실 수 있습니다.
 
 ### Information
-http://nodejs-webping.rhcloud.com/
+http://webping.url.ph/
 
 This URL webpage is working based on https://github.com/SDRLurker/webping .
 
