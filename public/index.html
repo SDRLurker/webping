@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">	
-<title>pinger</title>	
+<meta charset="utf-8">
+<title>pinger</title>
 </head>
 <body>
-주소 : <input id="addr" type="text" size="50"> 
+주소 : <input id="addr" type="text" size="50">
 <button id="add">추가</button>|
 호출 주기(1/1000초 단위) : <input id="timer" type="number" value="3000"/> |
 <button id="start">시작</button>
@@ -21,23 +21,68 @@
 </tr>
 </table>
 <p id='err'></p>
-
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript">
 	var timer;
 	var address_array = [];
 	var element_array = [];
 	var num = 0;
+
+	if (typeof(Storage) !== "undefined") {
+    num = localStorage.getItem('num');
+		if(num == null || num === "0")	num = 0;
+		address_array = localStorage.getItem('address_array');
+		if(address_array == null || address_array == "")	address_array = [];
+		else address_array = address_array.split(',');
+		element_array = localStorage.getItem('element_array');
+		if(element_array == null || element_array == "")	element_array = [];
+		else element_array = element_array.split(',');
+	}
+	function save(num, address_array, element_array) {
+		if (typeof(Storage) !== "undefined") {
+			localStorage.setItem('num', num);
+			localStorage.setItem('address_array', address_array);
+			localStorage.setItem('element_array', element_array);
+		}
+	}
+
+	function loadElement(i, v) {
+		$("#pings").append("<tr id='a" + i + "'><td>" + v +"</td>" +
+			"<td id='font_a" + i + "'>&nbsp;</td>" +
+			"<td><button id='del_a" + i + "'>삭제</button></td></tr>");
+
+		(function(i) {
+			var str = "#del_a" + i;
+			$(str).mousedown(function(e) {
+				var index = $.inArray("a" + i, element_array);
+				$("#a" + i).remove();
+
+				address_array.splice(index, 1);
+				element_array.splice(index, 1);
+				num--;
+				if(num <= 0) {
+					address_array = [];
+					element_array = [];
+					num = 0;
+				}
+				save(num, address_array, element_array);
+			});
+		})(i);
+	}
+
+	for(var ii=0;ii<num;ii++)
+		loadElement(element_array[ii].substring(1), address_array[ii]);
+
 	function padStr(i) {
 		return (i < 10) ? "0" + i : "" + i;
 	}
 	function getDateStr() {
 		var temp = new Date();
 		var dateStr = temp.getFullYear() + "/" +
-				padStr((1+temp.getMonth())) + "/" + 
+				padStr((1+temp.getMonth())) + "/" +
 				padStr(temp.getDate()) + " " +
 				padStr(temp.getHours()) + ":" +
-				padStr(temp.getMinutes()) + ":" + 
+				padStr(temp.getMinutes()) + ":" +
 				padStr(temp.getSeconds());
 		return dateStr;
 	}
@@ -56,12 +101,12 @@
 					var str = "#font_" + element_array[i];
 					if(data[i].alive){
 						$(str).html("<font color='green'>■</font>");
-					}	
+					}
 					else{
 						$(str).html("<font color='red'>■</font>");
 						$("#err").prepend("[" + getDateStr() + "] " +
                                 			data[i].host + " - 핑 오류!<br/>");
-					}					
+					}
 				}
 				$("#status").html("[" + getDateStr() + "] 작동중!" );
 			},
@@ -69,29 +114,16 @@
 				$("#err").prepend("[" + getDateStr() + "] 웹서버 접속 오류. 현재 컴퓨터의 인터넷 접속이 안될 수 있습니다.<br/>");
 			}
 		});
-	}	
-
+	}
 	$("#add").mousedown(function(e){
 		if($("#addr").val().length > 0) {
 			if($.inArray($("#addr").val(), address_array) === -1) {
 				address_array.push($("#addr").val());
 				element_array.push("a" + num);
-				$("#pings").append("<tr id='a" + num + "'><td>" + $("#addr").val() +"</td>" + 
-					"<td id='font_a" + num + "'>&nbsp;</td>" + 
-					"<td><button id='del_a" + num + "'>삭제</button></td></tr>");
-			
-				(function(i) {
-					var str = "#del_a" + i;
-					$(str).mousedown(function(e) {
-						var index = $.inArray("a" + i, element_array);
-						$("#a" + i).remove();
-						
-						address_array.splice(index, 1);
-						element_array.splice(index, 1);
-					});  
-				})(num);
 
+				loadElement(num, $("#addr").val());
 				num++;
+				save(num, address_array, element_array);
 			}
 		}
 	});
@@ -109,16 +141,16 @@
 			alert('주소를 1개 이상 추가해야 합니다.');
 			return;
 		}
-		if($("#addr").val().length>0)
+		if(num>0)
 		{
+			$("#addr").val(" ")
 			timer = setInterval(timerCall, milisec);
 		}
-	});	
+	});
 	$("#end").mousedown(function(e){
 		clearInterval(timer);
 		$("#status").html("[" + getDateStr() + "] 작동멈춤!" );
-	});	
+	});
 </script>
 </body>
 </html>
-
